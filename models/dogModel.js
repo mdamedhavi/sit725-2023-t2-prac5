@@ -1,11 +1,13 @@
-const mongoose = require('mongoose');
+let client = require('../db/dbConnection')
+let collection = client.db('sit_725').collection('dogs');
 
-const dogSchema = new mongoose.Schema({
-    title: String,
-    sub_title: String,
-    image_path: String,
-});
 
-const Dog = mongoose.model('dogs', dogSchema);
+function addDog(dog) {
+    return collection.insertOne(dog);
+}
 
-module.exports = Dog;
+async function getAllDogs() {
+    return await collection.find({}).toArray();
+}
+
+module.exports = { addDog, getAllDogs }

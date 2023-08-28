@@ -1,37 +1,21 @@
-// server.js
-const express = require('express');
-const mongoose = require('mongoose');
-const dogController = require('./controllers/dogController');
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-mongoose.connect('mongodb+srv://DewniManamperi:ASHAra99@sit725.09sxxbx.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch(error => {
-        console.error('Error connecting to MongoDB:', error);
-    });
-
-app.use(express.urlencoded({ extended: true }));
+var express = require("express")
+var app = express()
+var bodyParser = require('body-parser')
+app.use(express.static(__dirname + '/'))
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }))
 
-app.use(express.static('public'));
+require('./db/dbConnection')
+let router = require('./routes/router')
 
-app.use(dogController);
+app.set('views', 'public/views');
+app.set('view engine', 'ejs')
 
-// Set default route to fetch and display all dogs
-app.get('/', async (req, res) => {
-  try {
-      const dogs = await Dog.find({});
-      console.log(dogs);
-      res.status(200).render('index', { dogs });
-  } catch (error) {
-      res.status(500).json({ error: 'Internal server error!' });
-  }
-});
+app.use('/add-dog', router);
+app.use('/get-all-dogs', router);
+app.use('/', router);
 
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`App listening on port ${port}`);
 });
